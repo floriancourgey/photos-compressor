@@ -4,7 +4,7 @@
 # imports
 from __future__ import print_function
 import os, sys
-from PIL import Image
+from PIL import Image, ExifTags
 try:
     from os import scandir, walk
 except ImportError:
@@ -15,7 +15,6 @@ titre = "Photo compressor"
 dossierActuel = os.getcwd();
 
 # présentation
-
 print("##############################################")
 print("#                                            #")
 print("#    "+titre+" par Florian Courgey    #")
@@ -80,6 +79,9 @@ def compress(nom_fichier):
         # resize
         v("\tredimensionnement")
         im.thumbnail((largeur, hauteur))
+        # keep orientation
+        v("\torientation")
+        im = rotate_selon_orientation(im)
         # save en jpg de moindre qualite
         v("\tenregistrement")
         qua = qualite
@@ -97,6 +99,24 @@ def compress(nom_fichier):
         print("impossible de compresser "+ nom_fichier+ " (",e,")")
     print()
 
+def rotate_selon_orientation(image):
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(image._getexif().items())
+
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+
+    except (AttributeError, KeyError, IndexError):
+        pass
+
+    return image
 
 if(len(sys.argv) > 1):
     if(sys.argv[1] == "-options"):
@@ -116,12 +136,3 @@ for root, dirs, fichiers in os.walk('.'):
     for fichier in fichiers:
         print(fichier)
         compress(fichier)
-# compress(".\\attachment-img-1000x200.c.c.jpg");
-# compress("attachment-img-1000x200.jpg");
-# compress("attachment-img-1000x200.c.jpg");
-# compress("BYOD2.jpg");
-# compress("color00.jpg");
-
-
-# print(im.format, im.size, im.mode)
-# im.show();
