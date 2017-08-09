@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # imports
@@ -14,7 +14,7 @@ except ImportError:
 titre = "Photo compressor"
 dossierActuel = os.getcwd();
 
-# presentation
+# présentation
 
 print("##############################################")
 print("#                                            #")
